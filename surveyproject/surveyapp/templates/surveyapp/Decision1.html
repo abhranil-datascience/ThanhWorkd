@@ -1,0 +1,137 @@
+{% extends "global/Page.html" %}
+{% load otree %}
+
+{% block title %}
+    Question 1 - Decision
+{% endblock %}
+
+{% block styles %}
+    <style type="text/css">
+            .container{
+                max-width: 1200px;
+                height: 100%;
+                width: 100%;
+                position: relative;
+                justify-content: left;
+            }
+            #buttS{
+                position: absolute;
+                 top: 50%;
+                 left: 50%;
+                 transform: translate(-50%, -50%);
+            }
+            #buttA{
+                position: absolute;
+                justify-content: left;
+                left: 0px;
+                top: 0px;
+                text-align: left;
+                border: none;
+            }
+            #buttB{
+                position: absolute;
+                justify-content: right;
+                right: 0px;
+                top: 0px;
+                text-align: right;
+                border: none;
+            }
+            #buttC{
+                position: absolute;
+                justify-content: left;
+                left: 0px;
+                bottom: 0px;
+                text-align: left;
+                border: none;
+            }
+            #buttD{
+                position: absolute;
+                justify-content: right;
+                right: 0px;
+                bottom: 0px;
+                text-align: right;
+                border: none;
+            }
+            .btn:hover{
+                background-color: #4CAF50;
+                color: white;
+            }
+            .hidden{
+                display: none;
+            }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <b>What is Social Network Analysis?</b>
+    <br>
+    <br>
+    <br>
+    <div class="container" id="question" width ="840" height="350" align="center" style="position: relative; width: 840px; height: 350px;">
+            <button class="btn" type="button" id="buttS" style="position: absolute; justify-content: center" onclick="startReport()"> START </button>
+            <button class="btn hidden" name="decision1" value="a" id="buttA" style="justify-content: center" onclick="stopCount(this.id)"> Answer a </button>
+            <button class="btn hidden" name="decision1" value="b" id="buttB" style="justify-content: center" onclick="stopCount(this.id)"> Answer b </button>
+            <button class="btn hidden" name="decision1" value="c" id="buttC" style="justify-content: center" onclick="stopCount(this.id)"> Answer c </button>
+            <button class="btn hidden" name="decision1" value="d" id="buttD" style="justify-content: center" onclick="stopCount(this.id)"> Answer d </button>
+    </div>
+    <p id="player.coordinates1"></p>
+    <p id="time_spent"></p>
+    {% next_button %}
+{% endblock %}
+{% block scripts %}
+  <script>
+    //-------------------------------------------------------------------------------
+    var myCanvas = document.querySelector('#question');
+    var hastimestarted=0;
+    var starttime=""
+    var data = "";
+    var seconds = 1000;
+    myCanvas.addEventListener('mousemove',function(event){
+          console.log("Ha ha ha ")
+          var rect = myCanvas.getBoundingClientRect();
+          x = Math.round(event.clientX - rect.left);
+          y = Math.round(event.clientY- rect.top);
+          document.getElementById("player.coordinates1").innerHTML = x+ ", "+ y;
+          if (hastimestarted){
+            timeElapsed=Math.abs(new Date().getTime() - starttime)/seconds
+            document.getElementById("time_spent").innerHTML = "Time Elapsed: "+timeElapsed
+            data=data+x+","+y+","+timeElapsed+"|";
+          }
+        }, false);
+    //--------------------------------------------------------------------------------
+    function startReport()
+    {
+		    starttime=new Date().getTime();
+        hastimestarted=1;
+        //data=data+starttime+"||";
+        $('#buttA').toggleClass('hidden');
+        $('#buttB').toggleClass('hidden');
+        $('#buttC').toggleClass('hidden');
+        $('#buttD').toggleClass('hidden');
+        $('#buttS').toggleClass('hidden');
+    }
+    //-------------------------------------------------------------------------------
+    function stopCount()
+    {
+      hastimestarted=0;
+      var endtime = new Date().getTime();
+      data=data+(Math.abs(endtime - starttime)/seconds);
+      callpythonscript(data);
+    }
+    //------------------------------------------------------------------------------
+    function callpythonscript(data)
+    {
+      $.ajax({
+        type: "GET",
+        url: "http://localhost:5000/LogData",
+        data: { logdata: data },
+        success: callbackFunc,
+      });
+    }
+    function callbackFunc(response)
+    {
+      // do something with the response
+      console.log(response);
+    }
+  </script>
+{% endblock %}

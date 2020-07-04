@@ -1,0 +1,207 @@
+{% extends "global/Page.html" %}
+{% load otree %}
+
+{% block title %}
+    Question 1 - Decision
+{% endblock %}
+
+{% block content %}
+    <b>What is Social Network Analysis?</b>
+    <br>
+    <br>
+    <br>
+    <div class="container" id="question" width ="840" height="350" align="center" style="position: relative; width: 840px; height: 350px;">
+            <button class="btn" type="button" id="buttS" style="position: absolute; justify-content: center" onclick="startReport()"> START </button>
+            <button class="btn hidden" name="decision1" value="a" id="buttA" style="justify-content: center" onclick="stopCount(this.id)"> Answer a </button>
+            <button class="btn hidden" name="decision1" value="b" id="buttB" style="justify-content: center" onclick="stopCount(this.id)"> Answer b </button>
+            <button class="btn hidden" name="decision1" value="c" id="buttC" style="justify-content: center" onclick="stopCount(this.id)"> Answer c </button>
+            <button class="btn hidden" name="decision1" value="d" id="buttD" style="justify-content: center" onclick="stopCount(this.id)"> Answer d </button>
+    </div>
+
+    <form>
+    <input type="hidden" name="mouse_x" value="" id="mouse_x"/>
+    <input type="hidden" name="mouse_y" value="" id="mouse_y"/>
+    <input type="hidden" name="mouse_t" value="" id="mouse_t"/>
+
+    <input type="hidden" name="butt_at" value="" id="butt_at"/>
+    <input type="hidden" name="butt_ab" value="" id="butt_ab"/>
+    <input type="hidden" name="butt_al" value="" id="butt_al"/>
+    <input type="hidden" name="butt_ar" value="" id="butt_ar"/>
+    <input type="hidden" name="butt_bt" value="" id="butt_bt"/>
+    <input type="hidden" name="butt_bb" value="" id="butt_bb"/>
+    <input type="hidden" name="butt_bl" value="" id="butt_bl"/>
+    <input type="hidden" name="butt_br" value="" id="butt_br"/>
+    <input type="hidden" name="butt_ct" value="" id="butt_ct"/>
+    <input type="hidden" name="butt_cb" value="" id="butt_cb"/>
+    <input type="hidden" name="butt_cl" value="" id="butt_cl"/>
+    <input type="hidden" name="butt_cr" value="" id="butt_cr"/>
+    <input type="hidden" name="butt_dt" value="" id="butt_dt"/>
+    <input type="hidden" name="butt_db" value="" id="butt_db"/>
+    <input type="hidden" name="butt_dl" value="" id="butt_dl"/>
+    <input type="hidden" name="butt_dr" value="" id="butt_dr"/>
+    </form>
+
+    <p id="coordinates1"></p>
+    <br>
+    <p id="test"></p>
+    {% next_button %}
+{% endblock %}
+
+{% block styles %}
+    <style type="text/css">
+            .container{
+                max-width: 1200px;
+                height: 100%;
+                width: 100%;
+                position: relative;
+                justify-content: left;
+            }
+            #buttS{
+                position: absolute;
+                 top: 50%;
+                 left: 50%;
+                 transform: translate(-50%, -50%);
+            }
+            #buttA{
+                position: absolute;
+                justify-content: left;
+                left: 0px;
+                top: 0px;
+                text-align: left;
+                border: none;
+            }
+            #buttB{
+                position: absolute;
+                justify-content: right;
+                right: 0px;
+                top: 0px;
+                text-align: right;
+                border: none;
+            }
+            #buttC{
+                position: absolute;
+                justify-content: left;
+                left: 0px;
+                bottom: 0px;
+                text-align: left;
+                border: none;
+            }
+            #buttD{
+                position: absolute;
+                justify-content: right;
+                right: 0px;
+                bottom: 0px;
+                text-align: right;
+                border: none;
+            }
+            .btn:hover{
+                background-color: #4CAF50;
+                color: white;
+            }
+            .hidden{
+                display: none;
+            }
+    </style>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        var myCanvas = document.querySelector('#question');
+        myCanvas.addEventListener('mousemove',function(event){
+            var rect = myCanvas.getBoundingClientRect();
+            x = Math.round(event.clientX - rect.left);
+            y = Math.round(event.clientY- rect.top);
+            document.getElementById("coordinates1").innerHTML = x+ ", "+ y;
+            document.getElementById("test").innerHTML ="da da da";
+            }, false);
+
+        document.onmousemove = getMousePosition;
+        var delayedXPos = new Array();
+        var delayedYPos = new Array();
+        var delayedTime = new Array();
+
+        var xPos = new Array();
+        var yPos = new Array();
+
+        var initTime = new Date().getTime();
+        var timer_is_on = 0;
+        var t;
+		var dt = 10;
+        mp_called = 0;
+
+		function getMousePosition(mp){
+			var divPos = getPosition(document.getElementById("Questions"));
+			xPos.push(mp.pageX - divPos[0]);
+			yPos.push(mp.pageY - divPos[1]);
+			mp_called = 1;
+			return true;
+		}
+
+		function timedCount(){
+            if(mp_called){
+                delayedXPos.push(xPos[xPos.length-1]);
+                delayedYPos.push(yPos[yPos.length-1]);
+                var timeInSec = (new Date().getTime()-initTime) / 1000.;
+                delayedTime.push(timeInSec);
+            }
+
+			t=setTimeout("timedCount()",dt);
+		}
+
+		function doTimer(){
+		   if (!timer_is_on){
+                initTime = new Date().getTime();
+                timer_is_on=1;
+                timedCount();
+		   }
+		}
+
+		function stopCount(){
+		    clearTimeout(t);
+		    timer_is_on=0;
+
+		    document.getElementById('mouse_x').value = delayedXPos.join();
+		    document.getElementById('mouse_y').value = delayedYPos.join();
+		    document.getElementById('mouse_t').value = delayedTime.join();
+
+		    document.getElementById('butt_at').value = document.getElementById('buttA').getBoundingClientRect().top;
+		    document.getElementById('butt_ab').value = document.getElementById('buttA').getBoundingClientRect().bottom;
+		    document.getElementById('butt_al').value = document.getElementById('buttA').getBoundingClientRect().left;
+		    document.getElementById('butt_ar').value = document.getElementById('buttA').getBoundingClientRect().right;
+
+		    document.getElementById('butt_bt').value = document.getElementById('buttB').getBoundingClientRect().top;
+		    document.getElementById('butt_bb').value = document.getElementById('buttB').getBoundingClientRect().bottom;
+		    document.getElementById('butt_bl').value = document.getElementById('buttB').getBoundingClientRect().left;
+		    document.getElementById('butt_br').value = document.getElementById('buttB').getBoundingClientRect().right;
+
+		    document.getElementById('butt_ct').value = document.getElementById('buttC').getBoundingClientRect().top;
+		    document.getElementById('butt_cb').value = document.getElementById('buttC').getBoundingClientRect().bottom;
+		    document.getElementById('butt_cl').value = document.getElementById('buttC').getBoundingClientRect().left;
+		    document.getElementById('butt_cr').value = document.getElementById('buttC').getBoundingClientRect().right;
+
+		    document.getElementById('butt_dt').value = document.getElementById('buttD').getBoundingClientRect().top;
+		    document.getElementById('butt_db').value = document.getElementById('buttD').getBoundingClientRect().bottom;
+		    document.getElementById('butt_dl').value = document.getElementById('buttD').getBoundingClientRect().left;
+		    document.getElementById('butt_dr').value = document.getElementById('buttD').getBoundingClientRect().right;
+		}
+
+		function getPosition(obj){
+		    var topValue= 0,leftValue= 0;
+		    while(obj){
+                leftValue+= obj.offsetLeft;
+                topValue+= obj.offsetTop;
+                obj= obj.offsetParent;
+		    }
+		    return [leftValue, topValue];
+		}
+
+        function startReport(){
+		    doTimer();
+            $('#buttA').toggleClass('hidden');
+            $('#buttB').toggleClass('hidden');
+            $('#buttC').toggleClass('hidden');
+            $('#buttD').toggleClass('hidden');
+            $('#buttS').toggleClass('hidden');
+        }
+    </script>
+{% endblock %}
