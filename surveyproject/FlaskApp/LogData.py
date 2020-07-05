@@ -9,6 +9,10 @@ api = Api(app)
 class LogData(Resource):
     def get(self):
         logdata = request.args['logdata']
+        logdatasplitted=logdata.split("|")
+        SessionName = logdatasplitted[-1]
+        PlayerName = logdatasplitted[-2]
+        TimeElapsed = logdatasplitted[-3]
         XCoordinate=[]
         YCoordinate=[]
         Time=[]
@@ -19,13 +23,12 @@ class LogData(Resource):
                 XCoordinate.append(XYSplitted[0])
                 YCoordinate.append(XYSplitted[1])
                 Time.append(XYSplitted[2])
-            else:
-                XCoordinate.append("NA")
-                YCoordinate.append("NA")
-                Time.append(item)
+        XCoordinate.append("NA")
+        YCoordinate.append("NA")
+        Time.append(TimeElapsed)
         ResultDict=dict(XCoordinate=XCoordinate,YCoordinate=YCoordinate,TimeInSeconds=Time)
         ResultDF=pd.DataFrame.from_dict(ResultDict)
-        Filename="MouseCapture"+str(random.randint(10000,99999))+".csv"
+        Filename="MouseCapture"+str(random.randint(10000,99999))+"_"+SessionName+"_"+PlayerName+".csv"
         FilePath="../LogData/"+Filename
         ResultDF.to_csv(FilePath,index=False)
         return "success"
